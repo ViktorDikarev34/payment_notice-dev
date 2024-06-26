@@ -30,7 +30,7 @@ dp = Dispatcher()
 async def main():
     await dp.start_polling(bot)
 
-#хэндлер на запуск 
+#хэндлер на запуск
 # На нажатие кнопки старт выдает приветственное сообщение и кнопку "настройки"
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
@@ -56,7 +56,7 @@ async def cmd_start(message: types.Message):
 
 
 @dp.message(F.text.lower() == "настройки")
-async def options(message: types.Message): 
+async def options(message: types.Message):
     kb = [
         [
             types.KeyboardButton(text="Статусы платежей"),
@@ -74,4 +74,3 @@ async def options(message: types.Message):
 
 if __name__ == "__main__":
     asyncio.run(main())
-    
