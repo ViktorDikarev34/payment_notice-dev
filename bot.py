@@ -16,7 +16,7 @@ from aiogram_dialog.widgets.text import Format
 
 #Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
-# Объект ботаа
+# Объект бота
 bot = Bot(
     token=config.bot_token.get_secret_value(),
     default=DefaultBotProperties(
