@@ -1,34 +1,49 @@
+import asyncio
+import logging
+from random import randint
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.filters.command import Command
+from aiogram.filters import Command
+from aiogram import Bot, Dispatcher, types
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram import html, F
 from config_reader import config
 import requests
 import time
 
-API_URL = 'https://api.telegram.org/bot'
-API_CATS_URL = 'https://api.thecatapi.com/v1/images/search'
-BOT_TOKEN = config.bot_token.get_secret_value()
-TEXT = 'Как запилить из кофига токен'
-ERROR_TEXT = 'здесь должна была быть картинка с усатым котом'
-MAX_COUNTER = 100
+#Включаем логирование, чтобы не пропустить важные сообщения
+logging.basicConfig(level=logging.INFO)
+# Объект бота
+bot = Bot(
+    token=config.bot_token.get_secret_value(),
+    default=DefaultBotProperties( # type: ignore
+        parse_mode=ParseMode.HTML) # type: ignore
+    )
 
-offset = -2
-counter = 0
-chat_id: int
-cat_response: requests.Response
-cat_link: str
+# Диспетчер
+dp = Dispatcher()
 
-while counter < MAX_COUNTER:
-    print('attempt =', counter)
+# Запуск процесса поллинга новых апдейтов
+async def main():
+    await dp.start_polling(bot)
 
-    updates = requests.get(f'{API_URL}{BOT_TOKEN}/getUpdates?offset={offset + 1}').json()
+@dp.message(Command("random"))
+async def cmd_random(message: types.Message):
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text="Нажми меня",
+        callback_data='random_value'
+    ))
+    await message.answer(
+        "нажмите кнопку чтобы бот отправил число от 1 до 10",
+        reply_markup=builder.as_markup()
+    )
 
-    if updates['result']:
-        for result in updates['result']:
-            offset = result['update_id']
-            chat_id = result['message']['from']['id']
-            cat_response = requests.get(API_CATS_URL)
-            if cat_response.status_code == 200:
-                cat_link = cat_response.json()[0]['url']
-                requests.get(f'{API_URL}{BOT_TOKEN}/sendPhoto?chat_id={chat_id}&photo={cat_link}')
-            else:
-                requests.get(f'{API_URL}{BOT_TOKEN}/sendMessage?chat_id={chat_id}&{ERROR_TEXT}')
-    time.sleep(1)
-    counter += 1
+@dp.callback_query(F.data == "random_value")
+async def send_random_value(callback: types.CallbackQuery):
+    await callback.message.answer(str(randint(1, 10)))
+    await callback.answer()
+
+if __name__ == "__main__":
+    asyncio.run(main())
