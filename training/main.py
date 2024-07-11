@@ -1,27 +1,19 @@
-import asyncio
-
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from config_data.config import Config, load_config
-from handlers import other_handlers, user_handlers
+from handlers import taktakhandlers
 
 
-# Функция конфигурирования и запуска бота
-async def main() -> None:
+config: Config = load_config('.env')
 
-    # Загружаем конфиг в переменную config
-    config: Config = load_config()
+bot_token = config.tg_bot.token
 
-    # Инициализируем бот и диспетчер
-    bot = Bot(token=config.tg_bot.token)
-    dp = Dispatcher()
+dp = Dispatcher()
+bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
-    # Регистриуем роутеры в диспетчере
-    dp.include_router(user_handlers.router)
-    dp.include_router(other_handlers.router)
+dp.include_router(taktakhandlers.router)
 
-    # Пропускаем накопившиеся апдейты и запускаем polling
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
-
-
-asyncio.run(main())
+if __name__ == '__main__':
+    dp.run_polling(bot)
