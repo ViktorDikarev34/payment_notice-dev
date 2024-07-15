@@ -36,7 +36,7 @@ async def send_random_value_payment(callback: CallbackQuery):
 
 #При нажатии заказы выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
 @router.callback_query(F.data == LEXICON['but_2'])
-async def send_random_value(callback: CallbackQuery):
+async def send_random_value_orders(callback: CallbackQuery):
     keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
     user_data['{callback.data}'] = {}
     await callback.message.edit_text(  # type: ignore
@@ -45,7 +45,16 @@ async def send_random_value(callback: CallbackQuery):
     )
     await callback.answer()
 
-#
+#Набор статусов
+@router.callback_query(F.data.in_(spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2])) # type: ignore
+async def send_random_value(callback: CallbackQuery):
+
+    
+    await callback.message.edit_text(  # type: ignore
+        text=LEXICON['but_3'],
+        reply_markup=keyboard
+    )
+    await callback.answer()
 
 #При нажатии кнопки подтвердить выдает сообщение с кнопками периода
 @router.callback_query(F.data == 'last_btn')
