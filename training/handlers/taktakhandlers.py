@@ -3,64 +3,56 @@ from aiogram.filters import CommandStart
 from keyboards.creat_inlinekb import creat_inlinekb
 from aiogram.types import Message, CallbackQuery
 
+from lexicon.lexicon import LEXICON
+
+
 
 router= Router()
 
 user_data={}
 
+#При старте выдает две кнопки - платежи и заказы
 @router.message(CommandStart())
 async def process_start_command(message: Message):
-    keyboard = creat_inlinekb(1, 'платежи', 'заказы')
+    keyboard = creat_inlinekb(1, LEXICON['but_1'], LEXICON['but_2'])
     await message.answer(
-        text='Выберите что будем настраивать',
+        text=LEXICON['/start'],
         reply_markup=keyboard
     )
 
-@router.callback_query(F.data == "платежи")
-async def send_random_value(callback: CallbackQuery):
-    keyboard = creat_inlinekb(1, 'просроченные', 'сегодня', 'на этой неделе', 'в этом месяце', 'очистить выбор', 'отменить последний выбор', last_btn='подтвердить')
-    await callback.message.edit_text(
-        text='Какой период',
+spisok_tipo_ms = ['новый', 'не оплачено', 'оплачено']
+assembly = set()
+
+#При нажатии платежи выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
+@router.callback_query(F.data == LEXICON['but_1'])
+async def send_random_value_payment(callback: CallbackQuery):
+    keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
+    user_data['{callback.data}'] = {}
+    await callback.message.edit_text( # type: ignore
+        text=LEXICON['but_3'],
         reply_markup=keyboard
     )
     await callback.answer()
 
-@router.callback_query(F.data == "заказы")
+#При нажатии заказы выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
+@router.callback_query(F.data == LEXICON['but_2'])
 async def send_random_value(callback: CallbackQuery):
-    keyboard = creat_inlinekb(1, 'просроченные', 'сегодня', 'на этой неделе', 'в этом месяце', 'очистить выбор', 'отменить последний выбор', last_btn='подтвердить')
-    await callback.message.edit_text(
-        text='Какой период',
+    keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
+    user_data['{callback.data}'] = {}
+    await callback.message.edit_text(  # type: ignore
+        text=LEXICON['but_3'],
         reply_markup=keyboard
     )
+    await callback.answer()
 
-assembly = set()
-word = []
+#
 
-@router.callback_query(F.data.in_({'просроченные', 'сегодня', 'на этой неделе', 'в этом месяце'}))
-async def press_and_assembly(callback: CallbackQuery):
-    assembly.add(callback.data)
-    word.append(callback.data)
-    await callback.answer(
-        text=f'вы выбрали "{callback.data}"')
-
-@router.callback_query(F.data == 'отменить последний выбор')
-async def cancel_assembly(callback: CallbackQuery):
-    assembly.discard(word[-1])
-    await callback.answer(
-        text=f'вы убрали "{word[-1]}"')
-
-@router.callback_query(F.data == 'очистить выбор')
-async def clear(callback: CallbackQuery):
-    assembly.clear()
-    await callback.answer(
-        text='Вы очистили список',
-        show_alert=True
-    )
-
+#При нажатии кнопки подтвердить выдает сообщение с кнопками периода
 @router.callback_query(F.data == 'last_btn')
 async def press_and_assembly(callback: CallbackQuery):
-    await callback.answer(
-        text=f'вы выбрали {assembly}',
-        show_alert=True
+    keyboard = creat_inlinekb(2, LEXICON['but_5'], LEXICON['but_6'], LEXICON['but_7'], LEXICON['but_8'] )
+    await callback.message.edit_text( # type: ignore
+        text = LEXICON['but_9'],
+        reply_markup = keyboard
     )
-    await callback.answer()
+    await callback.answer('Вы выбрали')
