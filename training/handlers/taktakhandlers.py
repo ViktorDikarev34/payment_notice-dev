@@ -9,7 +9,9 @@ from lexicon.lexicon import LEXICON
 
 router= Router()
 
-user_data={}
+user_data={'item_type': None,
+           'status': set(),
+           'period': None}
 
 #При старте выдает две кнопки - платежи и заказы
 @router.message(CommandStart())
@@ -21,14 +23,12 @@ async def process_start_command(message: Message):
     )
 
 spisok_tipo_ms = ['новый', 'не оплачено', 'оплачено']
-assembly = set()
 
 #При нажатии платежи выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
 @router.callback_query(F.data == LEXICON['but_1'])
 async def send_random_value_payment(callback: CallbackQuery):
     keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
-    user_data.clear()
-    user_data[callback.data] = {}
+    user_data['item_type'] = callback.data
     await callback.message.edit_text( # type: ignore
         text=LEXICON['but_3'],
         reply_markup=keyboard
@@ -39,8 +39,7 @@ async def send_random_value_payment(callback: CallbackQuery):
 @router.callback_query(F.data == LEXICON['but_2'])
 async def send_random_value_orders(callback: CallbackQuery):
     keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
-    user_data.clear()
-    user_data[callback.data] = {}
+    user_data['item_type'] = callback.data
     await callback.message.edit_text(  # type: ignore
         text=LEXICON['but_3'],
         reply_markup=keyboard
@@ -50,7 +49,7 @@ async def send_random_value_orders(callback: CallbackQuery):
 #Набор статусов
 @router.callback_query(F.data.in_(spisok_tipo_ms))
 async def send_random_value(callback: CallbackQuery):
-    assembly.add(callback.data)
+    user_data['status'].add(callback.data)
     await callback.answer(
         text=f'Вы выбрали {callback.data}'
     )
@@ -58,11 +57,19 @@ async def send_random_value(callback: CallbackQuery):
 #При нажатии кнопки подтвердить выдает сообщение с кнопками периода
 @router.callback_query(F.data == 'last_btn')
 async def press_and_assembly(callback: CallbackQuery):
-    if LEXICON['but_1'] in user_data:
-        user_data[LEXICON['but_1']] = assembly
-    else:
-        user_data[LEXICON['but_2']] = assembly
+    keyboard = creat_inlinekb(1, LEXICON['but_5'], LEXICON['but_6'], LEXICON['but_7'], LEXICON['but_8'])
+    user_data['status'] = list(user_data['status'])
+    await callback.message.edit_text( # type: ignore
+        text = LEXICON['but_9'],
+        reply_markup=keyboard
+    )
+    await callback.answer()
+
+#При нажатии периода выдает словарь с выбранными параметрами
+@router.callback_query(F.data.in_([LEXICON['but_5'], LEXICON['but_6'], LEXICON['but_7'], LEXICON['but_8']]))
+async def period(callback: CallbackQuery):
+    user_data['period'] = callback.data
     await callback.message.answer(
-        text = f'Вы выбрали {user_data}',
+        text=f'Вы выбрали{user_data}'
     )
     await callback.answer()
