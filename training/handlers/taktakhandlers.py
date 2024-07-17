@@ -16,7 +16,7 @@ user_data={}
 async def process_start_command(message: Message):
     keyboard = creat_inlinekb(1, LEXICON['but_1'], LEXICON['but_2'])
     await message.answer(
-        text=LEXICON['/start'],
+        text=LEXICON['but_0'],
         reply_markup=keyboard
     )
 
@@ -27,7 +27,8 @@ assembly = set()
 @router.callback_query(F.data == LEXICON['but_1'])
 async def send_random_value_payment(callback: CallbackQuery):
     keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
-    user_data['{callback.data}'] = {}
+    user_data.clear()
+    user_data[callback.data] = {}
     await callback.message.edit_text( # type: ignore
         text=LEXICON['but_3'],
         reply_markup=keyboard
@@ -38,7 +39,8 @@ async def send_random_value_payment(callback: CallbackQuery):
 @router.callback_query(F.data == LEXICON['but_2'])
 async def send_random_value_orders(callback: CallbackQuery):
     keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
-    user_data['{callback.data}'] = {}
+    user_data.clear()
+    user_data[callback.data] = {}
     await callback.message.edit_text(  # type: ignore
         text=LEXICON['but_3'],
         reply_markup=keyboard
@@ -46,22 +48,21 @@ async def send_random_value_orders(callback: CallbackQuery):
     await callback.answer()
 
 #Набор статусов
-@router.callback_query(F.data.in_(spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2])) # type: ignore
+@router.callback_query(F.data.in_(spisok_tipo_ms))
 async def send_random_value(callback: CallbackQuery):
-
-    
-    await callback.message.edit_text(  # type: ignore
-        text=LEXICON['but_3'],
-        reply_markup=keyboard
+    assembly.add(callback.data)
+    await callback.answer(
+        text=f'Вы выбрали {callback.data}'
     )
-    await callback.answer()
 
 #При нажатии кнопки подтвердить выдает сообщение с кнопками периода
 @router.callback_query(F.data == 'last_btn')
 async def press_and_assembly(callback: CallbackQuery):
-    keyboard = creat_inlinekb(2, LEXICON['but_5'], LEXICON['but_6'], LEXICON['but_7'], LEXICON['but_8'] )
-    await callback.message.edit_text( # type: ignore
-        text = LEXICON['but_9'],
-        reply_markup = keyboard
+    if LEXICON['but_1'] in user_data:
+        user_data[LEXICON['but_1']] = assembly
+    else:
+        user_data[LEXICON['but_2']] = assembly
+    await callback.message.answer(
+        text = f'Вы выбрали {user_data}',
     )
-    await callback.answer('Вы выбрали')
+    await callback.answer()
