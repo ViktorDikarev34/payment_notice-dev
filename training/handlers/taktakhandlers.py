@@ -9,16 +9,14 @@ from lexicon.lexicon import LEXICON
 
 router= Router()
 
-user_data={'item_type': None,
-           'status': set(),
-           'period': None}
+user_data={}
 
 #При старте выдает две кнопки - платежи и заказы
 @router.message(CommandStart())
 async def process_start_command(message: Message):
     keyboard = creat_inlinekb(1, LEXICON['but_1'], LEXICON['but_2'])
     await message.answer(
-        text=LEXICON['but_0'],
+        text='Выберите что будем настраивать',
         reply_markup=keyboard
     )
 
@@ -27,10 +25,10 @@ spisok_tipo_ms = ['новый', 'не оплачено', 'оплачено']
 #При нажатии платежи выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
 @router.callback_query(F.data == LEXICON['but_1'])
 async def send_random_value_payment(callback: CallbackQuery):
-    keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
-    user_data['item_type'] = callback.data
+    keyboard = creat_inlinekb(1, *spisok_tipo_ms, last_btn=LEXICON['but_4'])
+    user_data.setdefault('item_type', callback.data)
     await callback.message.edit_text( # type: ignore
-        text=LEXICON['but_3'],
+        text='Какой статус',
         reply_markup=keyboard
     )
     await callback.answer()
@@ -38,10 +36,10 @@ async def send_random_value_payment(callback: CallbackQuery):
 #При нажатии заказы выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
 @router.callback_query(F.data == LEXICON['but_2'])
 async def send_random_value_orders(callback: CallbackQuery):
-    keyboard = creat_inlinekb(1, spisok_tipo_ms[0], spisok_tipo_ms[1], spisok_tipo_ms[2], last_btn=LEXICON['but_4'])
-    user_data['item_type'] = callback.data
+    keyboard = creat_inlinekb(1, *spisok_tipo_ms, last_btn=LEXICON['but_4'])
+    user_data.setdefault('item_type', callback.data)
     await callback.message.edit_text(  # type: ignore
-        text=LEXICON['but_3'],
+        text='Какой статус',
         reply_markup=keyboard
     )
     await callback.answer()
@@ -49,7 +47,7 @@ async def send_random_value_orders(callback: CallbackQuery):
 #Набор статусов
 @router.callback_query(F.data.in_(spisok_tipo_ms))
 async def send_random_value(callback: CallbackQuery):
-    user_data['status'].add(callback.data)
+
     await callback.answer(
         text=f'Вы выбрали {callback.data}'
     )
@@ -60,7 +58,7 @@ async def press_and_assembly(callback: CallbackQuery):
     keyboard = creat_inlinekb(1, LEXICON['but_5'], LEXICON['but_6'], LEXICON['but_7'], LEXICON['but_8'])
     user_data['status'] = list(user_data['status'])
     await callback.message.edit_text( # type: ignore
-        text = LEXICON['but_9'],
+        text = 'За какой период',
         reply_markup=keyboard
     )
     await callback.answer()
