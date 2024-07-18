@@ -47,7 +47,8 @@ async def send_random_value_orders(callback: CallbackQuery):
 #Набор статусов
 @router.callback_query(F.data.in_(spisok_tipo_ms))
 async def send_random_value(callback: CallbackQuery):
-
+    user_data.setdefault('status', set())
+    user_data['status'].add(callback.data)
     await callback.answer(
         text=f'Вы выбрали {callback.data}'
     )
