@@ -2,9 +2,9 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart
 from keyboards.creat_inlinekb import creat_inlinekb
 from aiogram.types import Message, CallbackQuery
-
+from handlers.function_from_ms import get_payment_status, get_order_status
 from lexicon.lexicon import LEXICON
-
+from classes.Onecallbackfactory import StatusCallbackFactory
 
 
 router= Router()
@@ -20,12 +20,15 @@ async def process_start_command(message: Message):
         reply_markup=keyboard
     )
 
-spisok_tipo_ms = ['новый', 'не оплачено', 'оплачено']
+
 
 #При нажатии платежи выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
 @router.callback_query(F.data == LEXICON['but_1'])
 async def send_random_value_payment(callback: CallbackQuery):
-    keyboard = creat_inlinekb(1, *spisok_tipo_ms, last_btn=LEXICON['but_4'])
+    value_payment = await get_payment_status()
+
+    keyboard = creat_inlinekb(1, *value_payment, cbd='Wich_status', last_btn=LEXICON['but_4'])
+
     user_data.setdefault('item_type', callback.data)
     await callback.message.edit_text( # type: ignore
         text='Какой статус',
@@ -33,10 +36,14 @@ async def send_random_value_payment(callback: CallbackQuery):
     )
     await callback.answer()
 
+
 #При нажатии заказы выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
 @router.callback_query(F.data == LEXICON['but_2'])
 async def send_random_value_orders(callback: CallbackQuery):
-    keyboard = creat_inlinekb(1, *spisok_tipo_ms, last_btn=LEXICON['but_4'])
+    value_order = await get_order_status()
+
+    keyboard = creat_inlinekb(1, *value_order, cbd='Wich_status', last_btn=LEXICON['but_4'])
+
     user_data.setdefault('item_type', callback.data)
     await callback.message.edit_text(  # type: ignore
         text='Какой статус',
@@ -45,13 +52,16 @@ async def send_random_value_orders(callback: CallbackQuery):
     await callback.answer()
 
 #Набор статусов
-@router.callback_query(F.data.in_(spisok_tipo_ms))
-async def send_random_value(callback: CallbackQuery):
+@router.callback_query(StatusCallbackFactory.filter(F.status == 'Wich_status'))
+async def send_random_value(callback: CallbackQuery,
+ callback_data: StatusCallbackFactory):
     user_data.setdefault('status', set())
-    user_data['status'].add(callback.data)
+    user_data['status'].add(callback_data.name)
     await callback.answer(
-        text=f'Вы выбрали {callback.data}'
+        text=f'Вы выбрали {callback_data.name}'
     )
+    await callback.answer()
+    print(callback.model_dump_json(indent=4, exclude_none=True))
 
 #При нажатии кнопки подтвердить выдает сообщение с кнопками периода
 @router.callback_query(F.data == 'last_btn')
