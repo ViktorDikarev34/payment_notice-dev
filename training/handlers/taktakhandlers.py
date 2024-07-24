@@ -61,7 +61,6 @@ async def send_random_value(callback: CallbackQuery,
         text=f'Вы выбрали {callback_data.name}'
     )
     await callback.answer()
-    print(callback.model_dump_json(indent=4, exclude_none=True))
 
 #При нажатии кнопки подтвердить выдает сообщение с кнопками периода
 @router.callback_query(F.data == 'last_btn')
