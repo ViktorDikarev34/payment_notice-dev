@@ -18,8 +18,9 @@ def creat_inlinekb (width: int,
                 callback_data=button if cbd == None else StatusCallbackFactory(status=cbd, name=button).pack()))
     if kwargs:
         for button, text in kwargs.items():
-            buttons.append(InlineKeyboardButton(text=text,
-                                                callback_data=button if cbd == None else StatusCallbackFactory(status=cbd, name=button)))
+            buttons.append(InlineKeyboardButton(
+                text=text,
+                callback_data=button if cbd == None else StatusCallbackFactory(status=cbd, name=button).pack()))
     kb_builder.row(*buttons, width=width)
 
     if last_btn:
