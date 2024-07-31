@@ -4,7 +4,7 @@ from pprint import pprint
 
 
 
-url = "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata"
+url = "https://api.moysklad.ru/api/remap/1.2/entity/metadata?filter=type=paymentout=states"
 headers = {
     "Authorization": "9c10e0dc4b1b681143e68c18a5f647e9b6480216",
     "Accept-Encoding": "gzip"
