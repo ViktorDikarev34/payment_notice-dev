@@ -4,6 +4,8 @@ from aiogram.enums import ParseMode
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from config_data.config import Config, load_config
 from handlers import taktakhandlers
+from config_data.config import token_ms
+
 
 
 config: Config = load_config('.env')

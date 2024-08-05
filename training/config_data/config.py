@@ -18,3 +18,5 @@ def load_config(path: str | None = None) -> Config:
             token=env('BOT_TOKEN')
         )
     )
+
+token_ms = '9c10e0dc4b1b681143e68c18a5f647e9b6480216'

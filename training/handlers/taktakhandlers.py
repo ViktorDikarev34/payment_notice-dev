@@ -27,7 +27,7 @@ async def process_start_command(message: Message):
 async def send_random_value_payment(callback: CallbackQuery):
     value_payment = await get_payment_status()
 
-    keyboard = creat_inlinekb(1, *value_payment, cbd='Wich_status', last_btn=LEXICON['but_4'])
+    keyboard = creat_inlinekb(1, *value_payment, cbdf='Wich_status', last_btn=LEXICON['but_4'])
 
     user_data.setdefault('item_type', callback.data)
     await callback.message.edit_text( # type: ignore
@@ -42,7 +42,7 @@ async def send_random_value_payment(callback: CallbackQuery):
 async def send_random_value_orders(callback: CallbackQuery):
     value_order = await get_order_status()
 
-    keyboard = creat_inlinekb(1, *value_order, cbd='Wich_status', last_btn=LEXICON['but_4'])
+    keyboard = creat_inlinekb(1, *value_order, cbdf='Wich_status', last_btn=LEXICON['but_4'])
 
     user_data.setdefault('item_type', callback.data)
     await callback.message.edit_text(  # type: ignore

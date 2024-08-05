@@ -6,7 +6,7 @@ from classes.Onecallbackfactory import StatusCallbackFactory
 
 def creat_inlinekb (width: int,
                     *args: str,
-                    cbd: str = None,
+                    cbdf: str = None,
                     last_btn: str = None,
                     **kwargs: str) -> InlineKeyboardMarkup:
     kb_builder = InlineKeyboardBuilder()
@@ -15,12 +15,12 @@ def creat_inlinekb (width: int,
         for button in args:
             buttons.append(InlineKeyboardButton(
                 text=LEXICON[button] if button in LEXICON else button,
-                callback_data=button if cbd == None else StatusCallbackFactory(status=cbd, name=button).pack()))
+                callback_data=button if cbdf == None else StatusCallbackFactory(status=cbdf, name=button).pack()))
     if kwargs:
         for button, text in kwargs.items():
             buttons.append(InlineKeyboardButton(
                 text=text,
-                callback_data=button if cbd == None else StatusCallbackFactory(status=cbd, name=button).pack()))
+                callback_data=button if cbdf == None else StatusCallbackFactory(status=cbdf, name=button).pack()))
     kb_builder.row(*buttons, width=width)
 
     if last_btn:
