@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart
 from keyboards.creat_inlinekb import creat_inlinekb
 from aiogram.types import Message, CallbackQuery
-from handlers.function_from_ms import get_payment_status, get_order_status
+from handlers.function_from_ms import list_button
 from lexicon.lexicon import LEXICON
 from classes.Onecallbackfactory import StatusCallbackFactory
 
@@ -25,7 +25,7 @@ async def process_start_command(message: Message):
 #При нажатии платежи выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
 @router.callback_query(F.data == LEXICON['but_1'])
 async def send_random_value_payment(callback: CallbackQuery):
-    value_payment = await get_payment_status()
+    value_payment = await list_button()
 
     keyboard = creat_inlinekb(1, *value_payment, cbdf='Wich_status', last_btn=LEXICON['but_4'])
 
