@@ -25,7 +25,7 @@ async def process_start_command(message: Message):
 #При нажатии платежи выдает следующее сообщение "какой статус" и кнопки из списка, можно выбирать несколько
 @router.callback_query(F.data == LEXICON['but_1'])
 async def send_random_value_payment(callback: CallbackQuery):
-    value_payment = await list_button()
+    value_payment = list_button()
 
     keyboard = creat_inlinekb(1, *value_payment, cbdf='Wich_status', last_btn=LEXICON['but_4'])
 
