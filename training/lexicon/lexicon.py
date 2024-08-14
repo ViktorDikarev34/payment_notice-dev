@@ -8,11 +8,12 @@ LEXICON: dict[str, str] = {
     'but_6': 'Сегодня',
     'but_7': 'На этой неделе',
     'but_8': 'В этом месяце',
-    'but_9': ''}
+    'but_9': ''
+    }
 
 BUTTONS: dict[str, str] = {
-    'btn_1': '1',
-    'btn_2': '2',
+    'платежи': 'paymentout',
+    'заказы': 'purchaseorder',
     'btn_3': '3',
     'btn_4': '4',
     'btn_5': '5',
