@@ -19,11 +19,8 @@ def list_button(key: str, token_ms: str = 'fd381c6be45d058539a1f5638ba484ecdd8df
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
-            print('успех')
             states = search_nessesary(response.json(), 'states')
             kbbutton = [i['name'] for i in states]
-            print(kbbutton)
-            #pprint(a := response.json())
             return kbbutton
     except Exception as ex:
             print(ex)

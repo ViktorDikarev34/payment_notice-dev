@@ -14,6 +14,8 @@ user_data={}
 #При старте выдает две кнопки - платежи и заказы
 @router.message(CommandStart())
 async def process_start_command(message: Message):
+    if user_data:
+        user_data.clear()
     keyboard = creat_inlinekb(1, LEXICON['but_1'], LEXICON['but_2'])
     await message.answer(
         text='Выберите что будем настраивать',
